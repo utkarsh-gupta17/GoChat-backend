@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	customwebsocket "gochat/websocket"
 	"log"
 	"net/http"
+	"os"
 )
 
 func serverWs(pool *customwebsocket.Pool, w http.ResponseWriter, r *http.Request) {
@@ -28,11 +30,17 @@ func setupRoutes() {
 	go pool.Start()
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "This is Workinggg!!")
 		serverWs(pool, w, r)
 	})
 }
 
 func main() {
 	setupRoutes()
-	http.ListenAndServe(":9000", nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "10000"
+	}
+	log.Println("Listening on port",port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s",port), nil))
 }
